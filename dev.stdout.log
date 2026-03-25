@@ -1,0 +1,17 @@
+
+> frya@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.13:3000
+- Environments: .env.local
+✓ Ready in 2.1s
+Creating turbopack project { dir: 'C:\\Users\\pedro\\frya', testMode: true }
+
+○ Compiling / ...
+ GET / 200 in 14.1s (next.js: 13.1s, application-code: 996ms)
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 6.0s (next.js: 4.1s, application-code: 1884ms)
+○ Compiling /onboarding ...
+ GET /onboarding 200 in 4.2s (next.js: 3.8s, application-code: 472ms)
