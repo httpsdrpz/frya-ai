@@ -11,7 +11,7 @@ export default async function AgentDetailPage({
   params: Promise<{ agentId: string }>;
 }) {
   const { userId } = await auth();
-  if (!userId) redirect("/login");
+  if (!userId) redirect("/sign-in");
 
   const { agentId } = await params;
   const agent = await getAgentById(agentId, userId);

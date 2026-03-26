@@ -6,7 +6,7 @@ import { getAgentsByUserId } from "@/lib/queries";
 
 export default async function AgentsPage() {
   const { userId } = await auth();
-  if (!userId) redirect("/login");
+  if (!userId) redirect("/sign-in");
 
   const agentsList = await getAgentsByUserId(userId);
 

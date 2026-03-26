@@ -1,11 +1,13 @@
-import { Inter } from "next/font/google";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { FryaLanding } from "@/components/marketing/FryaLanding";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-});
+export default async function Home() {
+  const { userId } = await auth();
 
-export default function Home() {
-  return <FryaLanding className={inter.className} />;
+  if (userId) {
+    redirect("/dashboard");
+  }
+
+  return <FryaLanding />;
 }

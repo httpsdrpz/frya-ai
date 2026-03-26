@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #091018;
-  --foreground: #f5f7fb;
-  --muted-foreground: #9dafc7;
-  --surface: rgba(10, 20, 31, 0.78);
-  --surface-strong: #122030;
-  --primary: #ff8139;
-  --primary-foreground: #1d120b;
-  --border: rgba(183, 205, 231, 0.12);
+  --background: #020403;
+  --foreground: #f4f8f2;
+  --muted-foreground: #93a79b;
+  --surface: rgba(7, 10, 8, 0.78);
+  --surface-strong: #0d1712;
+  --primary: #0b6b3a;
+  --primary-foreground: #f7fff9;
+  --border: rgba(168, 199, 178, 0.12);
 }
 
 @theme inline {
@@ -30,8 +30,8 @@
 
 html {
   background:
-    linear-gradient(180deg, rgba(255, 129, 57, 0.06), transparent 22%),
-    linear-gradient(135deg, #091018 0%, #101a28 55%, #091018 100%);
+    linear-gradient(180deg, rgba(11, 107, 58, 0.12), transparent 24%),
+    linear-gradient(135deg, #010201 0%, #050806 48%, #010201 100%);
 }
 
 body {
@@ -63,8 +63,8 @@ textarea {
 
 .bg-grid {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-position: center;
   background-size: 42px 42px;
 }
