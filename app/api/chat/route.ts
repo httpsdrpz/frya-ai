@@ -1,56 +1,43 @@
-import { callClaude } from "@/lib/claude";
-import {
-  generateAgentReply,
-  getAgentById,
-  getDefaultCompanyProfile,
-} from "@/lib/agents/orchestrator";
-import type { AgentChatMessage, AgentKey } from "@/types";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { callClaude, type Message } from "@/lib/claude";
+import { getAgentById, saveConversation } from "@/lib/queries";
 
-export async function POST(request: Request) {
-  const payload = (await request.json().catch(() => null)) as
-    | {
-        agentId?: AgentKey;
-        message?: string;
-      }
-    | null;
-
-  if (!payload?.agentId || !payload.message) {
-    return Response.json(
-      { error: "agentId e message sao obrigatorios." },
-      { status: 400 },
-    );
-  }
-
-  const company = getDefaultCompanyProfile();
-  const agent = getAgentById(payload.agentId, company);
-
-  if (!agent) {
-    return Response.json({ error: "Agente nao encontrado." }, { status: 404 });
-  }
-
-  let content = generateAgentReply(payload.agentId, payload.message, company);
-
+export async function POST(req: NextRequest) {
   try {
-    content = await callClaude(
-      [
-        {
-          role: "user",
-          content: payload.message,
-        },
-      ],
-      `Voce e ${agent.name}, um agente especializado da Frya.ai. Responda em portugues com foco no objetivo: ${agent.objective}`,
-    );
-  } catch {
-    content = generateAgentReply(payload.agentId, payload.message, company);
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
+    }
+
+    const { agentId, messages } = (await req.json()) as {
+      agentId: string;
+      messages: Message[];
+    };
+
+    if (!agentId || !messages?.length) {
+      return NextResponse.json({ error: "Dados invalidos" }, { status: 400 });
+    }
+
+    // Busca agente real do banco
+    const agent = await getAgentById(agentId, userId);
+    if (!agent) {
+      return NextResponse.json(
+        { error: "Agente nao encontrado" },
+        { status: 404 },
+      );
+    }
+
+    // Chama Claude com o system prompt customizado do agente
+    const reply = await callClaude(messages, agent.systemPrompt, 1000);
+
+    // Salva historico
+    const allMessages = [...messages, { role: "assistant", content: reply }];
+    await saveConversation(agentId, userId, allMessages);
+
+    return NextResponse.json({ message: reply });
+  } catch (error) {
+    console.error("ERRO CHAT:", error);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
-
-  const message: AgentChatMessage = {
-    id: crypto.randomUUID(),
-    agentId: payload.agentId,
-    role: "assistant",
-    content,
-    createdAt: new Date().toISOString(),
-  };
-
-  return Response.json({ message });
 }

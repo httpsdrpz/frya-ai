@@ -21,6 +21,8 @@ REGRAS:
   {"action": "generate_agents", "data": {"name": "", "segment": "", "size": "", "mainPain": "", "icp": "", "product": "", "tone": "", "suggestedAgents": ["sdr"|"cs"|"financeiro"|"marketing"]}}
 - Antes de gerar, confirme com o usuario: "Posso criar esses agentes pra voce?"
 
+IMPORTANTE: Faça SEMPRE apenas UMA pergunta por vez. Nunca liste múltiplas perguntas em sequência.
+
 Tom: amigavel, brasileira, confiante. Voce e a melhor funcionaria que eles ja tiveram.`;
 
 function toClaudeMessages(input: unknown): Message[] {

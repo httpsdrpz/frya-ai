@@ -1,26 +1,41 @@
-import { AgentCard } from "@/components/agents/AgentCard";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createAgentTeam, getDefaultCompanyProfile } from "@/lib/agents/orchestrator";
-import { getDatabaseHealth } from "@/lib/db";
+import {
+  getAgentsByUserId,
+  getCompanyByUserId,
+  hasCompletedOnboarding,
+} from "@/lib/queries";
 
-export default function DashboardPage() {
-  const company = getDefaultCompanyProfile();
-  const bundle = createAgentTeam(company);
-  const dbHealth = getDatabaseHealth();
-  const readinessAverage = Math.round(
-    bundle.agents.reduce((total, agent) => total + agent.readiness, 0) /
-      bundle.agents.length,
-  );
+export default async function DashboardPage() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/login");
+  }
+
+  // Redireciona pro onboarding se ainda nao completou
+  const onboarded = await hasCompletedOnboarding(userId);
+  if (!onboarded) {
+    redirect("/onboarding");
+  }
+
+  const [company, agentsList] = await Promise.all([
+    getCompanyByUserId(userId),
+    getAgentsByUserId(userId),
+  ]);
+
+  const activeAgents = agentsList.filter((a) => a.status === "active");
 
   return (
     <div className="space-y-6">
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
-          ["Agentes no time", String(bundle.agents.length)],
-          ["Prontidao media", `${readinessAverage}%`],
-          ["Canais mapeados", String(company.salesChannels.length)],
-          ["Banco de dados", dbHealth.configured ? "Conectado" : "Pendente"],
+          ["Agentes ativos", String(activeAgents.length)],
+          ["Total de agentes", String(agentsList.length)],
+          ["Segmento", company?.segment ?? "-"],
+          ["Plano", "Free"],
         ].map(([label, value]) => (
           <Card key={label} className="border-white/12 bg-surface-strong/80">
             <CardContent className="mt-0 space-y-2">
@@ -33,70 +48,86 @@ export default function DashboardPage() {
         ))}
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <Card className="border-white/12 bg-surface-strong/80">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <CardTitle>{company.businessName}</CardTitle>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {company.description}
-                </p>
+      {company && (
+        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+          <Card className="border-white/12 bg-surface-strong/80">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <CardTitle>{company.name}</CardTitle>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {company.segment} / {company.size} pessoas
+                  </p>
+                </div>
+                <Badge variant="accent">{company.segment}</Badge>
               </div>
-              <Badge variant="accent">{company.industry}</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  dores principais
-                </p>
-                <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-                  {company.painPoints.map((pain) => (
-                    <li key={pain}>• {pain}</li>
-                  ))}
-                </ul>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                    principal dor
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    {company.mainPain ?? "-"}
+                  </p>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                    cliente ideal
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    {company.icp ?? "-"}
+                  </p>
+                </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  objetivos imediatos
-                </p>
-                <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-                  {company.goals.map((goal) => (
-                    <li key={goal}>• {goal}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card className="border-white/12 bg-surface-strong/80">
-          <CardHeader>
-            <CardTitle>Proximos passos do MVP</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-            <p>1. Conectar autenticacao real com Clerk.</p>
-            <p>2. Persistir companies, agents e chats com Drizzle + Neon.</p>
-            <p>3. Trocar respostas mock por inferencia via Claude.</p>
-            <p>4. Plugar billing e planos no Stripe.</p>
-          </CardContent>
-        </Card>
-      </section>
+          <Card className="border-white/12 bg-surface-strong/80">
+            <CardHeader>
+              <CardTitle>Proximos passos</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+              <p>1. Conectar WhatsApp ao agente SDR.</p>
+              <p>2. Testar primeiro follow-up automatico.</p>
+              <p>3. Acompanhar metricas de resposta.</p>
+              <p>4. Upgrade pro plano Pro quando escalar.</p>
+            </CardContent>
+          </Card>
+        </section>
+      )}
 
       <section className="space-y-4">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            time recomendado
+            seu time
           </p>
           <h2 className="mt-2 font-display text-3xl text-white">
-            Agentes montados para a operacao atual
+            Agentes configurados para sua operacao
           </h2>
         </div>
         <div className="grid gap-4 xl:grid-cols-3">
-          {bundle.agents.map((agent) => (
-            <AgentCard key={agent.id} agent={agent} href={`/agents/${agent.id}`} />
+          {agentsList.map((agent) => (
+            <Card key={agent.id} className="border-white/12 bg-surface-strong/80">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>{agent.name}</CardTitle>
+                  <Badge variant={agent.status === "active" ? "success" : "accent"}>
+                    {agent.status === "active" ? "Ativo" : agent.status}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground capitalize">{agent.type}</p>
+              </CardHeader>
+              <CardContent>
+                <a
+                  href={`/agents/${agent.id}`}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Abrir agente {"->"}
+                </a>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </section>
