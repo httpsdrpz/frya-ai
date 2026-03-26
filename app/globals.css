@@ -104,3 +104,37 @@ textarea {
 .animate-panel-in {
   animation: frya-panel-in 420ms ease-out both;
 }
+
+@keyframes frya-float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes frya-glow-soft {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 rgba(11, 107, 58, 0),
+      0 18px 46px rgba(11, 107, 58, 0.18);
+  }
+
+  50% {
+    box-shadow:
+      0 0 34px rgba(11, 107, 58, 0.22),
+      0 22px 58px rgba(11, 107, 58, 0.28);
+  }
+}
+
+.animate-float-soft {
+  animation: frya-float-soft 6s ease-in-out infinite;
+}
+
+.animate-glow-soft {
+  animation: frya-glow-soft 4s ease-in-out infinite;
+}
