@@ -73,6 +73,30 @@ textarea {
   text-wrap: balance;
 }
 
+@keyframes frya-orb-drift {
+  0%,
+  100% {
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(-46%, 18px, 0) scale(1.06);
+  }
+}
+
+@keyframes frya-dot-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
 @keyframes frya-message-in {
   from {
     opacity: 0;
@@ -99,6 +123,14 @@ textarea {
 
 .animate-message-in {
   animation: frya-message-in 320ms ease-out both;
+}
+
+.landing-hero-glow {
+  animation: frya-orb-drift 12s ease-in-out infinite;
+}
+
+.frya-typing-dot {
+  animation: frya-dot-pulse 1.2s ease-in-out infinite;
 }
 
 .animate-panel-in {
@@ -137,4 +169,15 @@ textarea {
 
 .animate-glow-soft {
   animation: frya-glow-soft 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-glow,
+  .frya-typing-dot,
+  .animate-message-in,
+  .animate-panel-in,
+  .animate-float-soft,
+  .animate-glow-soft {
+    animation: none !important;
+  }
 }

@@ -1,53 +1,64 @@
 "use client";
 
-import { useEffect, useEffectEvent } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 export function CursorGlow() {
-  const rawX = useMotionValue(-240);
-  const rawY = useMotionValue(-240);
-  const x = useSpring(rawX, {
-    stiffness: 70,
-    damping: 24,
-    mass: 0.7,
-  });
-  const y = useSpring(rawY, {
-    stiffness: 70,
-    damping: 24,
-    mass: 0.7,
-  });
-
-  const updateGlow = useEffectEvent((event: PointerEvent) => {
-    rawX.set(event.clientX - 240);
-    rawY.set(event.clientY - 240);
-  });
+  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
 
-    rawX.set(window.innerWidth / 2 - 240);
-    rawY.set(window.innerHeight / 3 - 240);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
-    const handlePointerMove = (event: PointerEvent) => {
-      updateGlow(event);
+    if (reduceMotion || coarsePointer) {
+      return;
+    }
+
+    const glow = glowRef.current;
+
+    if (!glow) {
+      return;
+    }
+
+    let frameId = 0;
+    let currentX = window.innerWidth / 2 - 160;
+    let currentY = window.innerHeight / 3 - 160;
+    let targetX = currentX;
+    let targetY = currentY;
+
+    const render = () => {
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+
+      glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+      frameId = window.requestAnimationFrame(render);
     };
 
+    const handlePointerMove = (event: PointerEvent) => {
+      targetX = event.clientX - 160;
+      targetY = event.clientY - 160;
+    };
+
+    glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
     window.addEventListener("pointermove", handlePointerMove, {
       passive: true,
     });
+    frameId = window.requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
+      window.cancelAnimationFrame(frameId);
     };
-  }, [rawX, rawY]);
+  }, []);
 
   return (
-    <motion.div
+    <div
+      ref={glowRef}
       aria-hidden="true"
-      className="pointer-events-none fixed left-0 top-0 z-10 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(11,107,58,0.16)_0%,rgba(11,107,58,0.08)_32%,rgba(11,107,58,0)_72%)] blur-[140px]"
-      style={{ x, y }}
+      className="pointer-events-none fixed left-0 top-0 z-10 hidden h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(11,107,58,0.12)_0%,rgba(11,107,58,0.06)_35%,rgba(11,107,58,0)_72%)] blur-[96px] lg:block"
     />
   );
 }
