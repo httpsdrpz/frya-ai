@@ -1,4 +1,3 @@
-import { callClaude } from "@/lib/claude";
 import { agents, companies, users } from "@/db/schema";
 import { createCsAgent, replyAsCs } from "@/lib/agents/cs";
 import {
@@ -9,6 +8,10 @@ import {
   createMarketingAgent,
   replyAsMarketing,
 } from "@/lib/agents/marketing";
+import {
+  buildSystemPrompt,
+  companyContextFromOnboarding,
+} from "@/lib/prompts/builder";
 import { createSdrAgent, replyAsSdr } from "@/lib/agents/sdr";
 import { db } from "@/lib/db";
 import type {
@@ -452,9 +455,10 @@ export async function generateAgentsFromOnboarding(
 
   const createdAgents = [];
   const validAgentTypes = data.suggestedAgents.filter(isAgentKey);
+  const companyContext = companyContextFromOnboarding(data);
 
   for (const agentType of validAgentTypes) {
-    const systemPrompt = await generateSystemPrompt(agentType, data);
+    const systemPrompt = buildSystemPrompt(agentType, companyContext);
     const names = AGENT_NAMES[agentType as keyof typeof AGENT_NAMES] || ["AGENT"];
     const agentName = names[0];
 
@@ -475,36 +479,6 @@ export async function generateAgentsFromOnboarding(
   }
 
   return createdAgents;
-}
-
-async function generateSystemPrompt(
-  agentType: string,
-  data: OnboardingData,
-): Promise<string> {
-  const prompt = `Gere um system prompt em portugues para um agente de IA do tipo "${agentType}" para a seguinte empresa:
-
-Empresa: ${data.name}
-Segmento: ${data.segment}
-Tamanho: ${data.size}
-Produto/Servico: ${data.product}
-Cliente ideal: ${data.icp}
-Principal dor que o agente resolve: ${data.mainPain}
-Tom de voz: ${data.tone}
-
-O system prompt deve:
-1. Definir claramente o papel e objetivo do agente
-2. Incluir contexto especifico da empresa
-3. Definir como se comunicar com os clientes
-4. Incluir exemplos de situacoes comuns
-5. Ser escrito em portugues, tom ${data.tone}
-
-Retorne APENAS o system prompt, sem explicacoes adicionais.`;
-
-  return await callClaude(
-    [{ role: "user", content: prompt }],
-    "Voce e um especialista em criar system prompts para agentes de IA empresariais brasileiros.",
-    1000,
-  );
 }
 
 export function getDefaultCompanyProfile() {

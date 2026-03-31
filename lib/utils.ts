@@ -1,4 +1,9 @@
-import type { AgentState } from "@/types";
+import type {
+  AgentState,
+  LeadClassification,
+  LeadSource,
+  LeadStatus,
+} from "@/types";
 
 export function cn(...inputs: Array<string | false | null | undefined>) {
   return inputs.filter(Boolean).join(" ");
@@ -30,4 +35,128 @@ export function formatList(items: string[]) {
     style: "long",
     type: "conjunction",
   }).format(items);
+}
+
+export function formatDate(value: Date | string | null | undefined) {
+  if (!value) {
+    return "-";
+  }
+
+  const parsed = typeof value === "string" ? new Date(value) : value;
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(parsed);
+}
+
+export function formatDateTime(value: Date | string | null | undefined) {
+  if (!value) {
+    return "-";
+  }
+
+  const parsed = typeof value === "string" ? new Date(value) : value;
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(parsed);
+}
+
+export function formatRelativeTime(value: Date | string | null | undefined) {
+  if (!value) {
+    return "Sem contato";
+  }
+
+  const parsed = typeof value === "string" ? new Date(value) : value;
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "Sem contato";
+  }
+
+  const diffMs = parsed.getTime() - Date.now();
+  const diffMinutes = Math.round(diffMs / (1000 * 60));
+  const formatter = new Intl.RelativeTimeFormat("pt-BR", { numeric: "auto" });
+
+  if (Math.abs(diffMinutes) < 60) {
+    return formatter.format(diffMinutes, "minute");
+  }
+
+  const diffHours = Math.round(diffMinutes / 60);
+
+  if (Math.abs(diffHours) < 24) {
+    return formatter.format(diffHours, "hour");
+  }
+
+  const diffDays = Math.round(diffHours / 24);
+
+  if (Math.abs(diffDays) < 7) {
+    return formatter.format(diffDays, "day");
+  }
+
+  const diffWeeks = Math.round(diffDays / 7);
+  return formatter.format(diffWeeks, "week");
+}
+
+export function formatLeadStatus(status: LeadStatus) {
+  switch (status) {
+    case "novo":
+      return "Novo";
+    case "qualificado":
+      return "Qualificado";
+    case "reuniao":
+      return "Reuniao";
+    case "negociacao":
+      return "Negociacao";
+    case "fechado":
+      return "Fechado";
+    case "perdido":
+      return "Perdido";
+    default:
+      return status;
+  }
+}
+
+export function formatLeadClassification(classification: LeadClassification) {
+  switch (classification) {
+    case "hot":
+      return "Hot";
+    case "warm":
+      return "Warm";
+    case "cold":
+      return "Cold";
+    case "unscored":
+      return "Sem score";
+    default:
+      return classification;
+  }
+}
+
+export function formatLeadSource(source: LeadSource) {
+  switch (source) {
+    case "whatsapp":
+      return "WhatsApp";
+    case "instagram":
+      return "Instagram";
+    case "email":
+      return "Email";
+    case "site":
+      return "Site";
+    case "manual":
+      return "Manual";
+    default:
+      return source;
+  }
 }

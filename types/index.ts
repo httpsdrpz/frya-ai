@@ -1,6 +1,15 @@
 export type MessageRole = "assistant" | "user" | "system";
 
 export type AgentKey = "sdr" | "cs" | "financeiro" | "marketing";
+export type LeadSource = "whatsapp" | "instagram" | "email" | "site" | "manual";
+export type LeadStatus =
+  | "novo"
+  | "qualificado"
+  | "reuniao"
+  | "negociacao"
+  | "fechado"
+  | "perdido";
+export type LeadClassification = "hot" | "warm" | "cold" | "unscored";
 
 export type AgentState = "draft" | "configuring" | "active";
 
@@ -104,4 +113,33 @@ export interface DatabaseHealth {
 export interface ClaudeMessage {
   role: "user" | "assistant";
   content: string;
+}
+
+export interface LeadFilters {
+  status?: LeadStatus;
+  classification?: LeadClassification;
+}
+
+export interface LeadStats {
+  totalLeads: number;
+  statusCounts: Record<LeadStatus, number>;
+  classificationCounts: Record<LeadClassification, number>;
+  averageScore: number;
+  newToday: number;
+  newThisWeek: number;
+  qualifiedLeads: number;
+  conversionRate: number;
+  followUpsPending: number;
+}
+
+export interface ConversationPreview {
+  id: string;
+  agentId: string;
+  agentName: string;
+  agentType: AgentKey;
+  leadName: string | null;
+  preview: string;
+  lastMessageAt: string;
+  updatedAt: string;
+  messageCount: number;
 }

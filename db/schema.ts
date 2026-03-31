@@ -8,6 +8,11 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+import type {
+  LeadClassification,
+  LeadSource,
+  LeadStatus,
+} from "@/types";
 
 type Plan = "free" | "pro" | "business";
 type AgentType = "sdr" | "cs" | "financeiro" | "marketing";
@@ -72,6 +77,30 @@ export const companies = pgTable("companies", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const leads = pgTable("leads", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  companyId: uuid("company_id")
+    .notNull()
+    .references(() => companies.id),
+  userId: text("user_id").notNull(),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  email: text("email"),
+  source: text("source").$type<LeadSource>().default("manual"),
+  status: text("status").$type<LeadStatus>().notNull().default("novo"),
+  score: integer("score").default(0),
+  classification: text("classification")
+    .$type<LeadClassification>()
+    .default("unscored"),
+  mainPain: text("main_pain"),
+  notes: text("notes"),
+  nextStep: text("next_step"),
+  nextStepAt: timestamp("next_step_at"),
+  lastContactAt: timestamp("last_contact_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // agents - agentes criados para cada empresa
 export const agents = pgTable("agents", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -124,6 +153,9 @@ export type NewUser = typeof users.$inferInsert;
 
 export type Company = typeof companies.$inferSelect;
 export type NewCompany = typeof companies.$inferInsert;
+
+export type Lead = typeof leads.$inferSelect;
+export type NewLead = typeof leads.$inferInsert;
 
 export type Agent = typeof agents.$inferSelect;
 export type NewAgent = typeof agents.$inferInsert;

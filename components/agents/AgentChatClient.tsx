@@ -10,21 +10,33 @@ import { Textarea } from "@/components/ui/textarea";
 interface Message {
   role: "user" | "assistant";
   content: string;
+  createdAt?: string;
+  metadata?: Record<string, unknown>;
 }
 
 interface AgentChatClientProps {
   agentId: string;
   agentName: string;
   agentType: string;
-  initialHistory: { role: string; content: string }[];
+  conversationId?: string;
+  initialHistory: {
+    role: string;
+    content: string;
+    createdAt?: string;
+    metadata?: Record<string, unknown>;
+  }[];
 }
 
 export function AgentChatClient({
   agentId,
   agentName,
   agentType,
+  conversationId,
   initialHistory,
 }: AgentChatClientProps) {
+  const [activeConversationId, setActiveConversationId] = useState(
+    conversationId ?? null,
+  );
   const [messages, setMessages] = useState<Message[]>(
     initialHistory.length > 0
       ? (initialHistory as Message[])
@@ -55,15 +67,27 @@ export function AgentChatClient({
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
             agentId,
+            conversationId: activeConversationId,
             messages: nextMessages,
           }),
         });
 
-        const data = (await res.json()) as { message?: string };
-        const reply: Message = {
-          role: "assistant",
-          content: data.message ?? "Nao consegui processar agora. Tente novamente.",
+        const data = (await res.json()) as {
+          message?: string;
+          conversationId?: string;
+          assistantMessage?: Message;
         };
+
+        if (data.conversationId) {
+          setActiveConversationId(data.conversationId);
+        }
+
+        const reply: Message =
+          data.assistantMessage ??
+          ({
+            role: "assistant",
+            content: data.message ?? "Nao consegui processar agora. Tente novamente.",
+          } satisfies Message);
 
         setMessages((prev) => [...prev, reply]);
         setTimeout(

@@ -69,6 +69,7 @@ export default async function AgentDetailPage({
           agentId={agent.id}
           agentName={agent.name}
           agentType={agent.type}
+          conversationId={conversation?.id}
           initialHistory={history}
         />
       </section>

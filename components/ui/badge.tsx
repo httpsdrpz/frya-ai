@@ -6,6 +6,7 @@ const badgeVariants = {
   accent: "bg-primary/14 text-primary",
   success: "bg-emerald-500/16 text-emerald-300",
   warning: "bg-amber-500/16 text-amber-200",
+  danger: "bg-red-500/16 text-red-300",
   muted: "bg-white/6 text-muted-foreground",
 } as const;
 

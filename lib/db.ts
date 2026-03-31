@@ -1,12 +1,33 @@
+import fs from "node:fs";
+import path from "node:path";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "@/db/schema";
 import type { DatabaseHealth, OnboardingAnalysis } from "@/types";
 
+function readLocalEnv(key: string) {
+  const envPath = path.join(process.cwd(), ".env.local");
+
+  if (!fs.existsSync(envPath)) {
+    return undefined;
+  }
+
+  const content = fs.readFileSync(envPath, "utf8");
+  const line = content
+    .split(/\r?\n/)
+    .find((entry) => entry.startsWith(`${key}=`));
+
+  if (!line) {
+    return undefined;
+  }
+
+  return line.slice(key.length + 1).trim();
+}
+
 export const databaseConfig = {
   provider: "neon" as const,
   orm: "drizzle" as const,
-  connectionString: process.env.DATABASE_URL ?? "",
+  connectionString: process.env.DATABASE_URL ?? readLocalEnv("DATABASE_URL") ?? "",
 };
 
 function hasUsableDatabaseUrl(connectionString: string) {
