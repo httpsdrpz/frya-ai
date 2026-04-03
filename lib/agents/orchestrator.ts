@@ -25,7 +25,7 @@ import type {
 } from "@/types";
 
 const AGENT_NAMES = {
-  sdr: ["VECTOR", "APEX", "PULSE"],
+  sdr: ["Frya", "APEX", "PULSE"],
   cs: ["ARIA", "ECHO", "NOVA"],
   financeiro: ["FLUX", "LEDGER", "VAULT"],
   marketing: ["CIPHER", "SPARK", "WAVE"],

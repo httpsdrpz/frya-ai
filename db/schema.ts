@@ -109,7 +109,7 @@ export const agents = pgTable("agents", {
     .references(() => companies.id),
   userId: text("user_id").notNull(),
   type: text("type").$type<AgentType>().notNull(), // sdr | cs | financeiro | marketing
-  name: text("name").notNull(), // ex: "VECTOR", "ARIA", "FLUX"
+  name: text("name").notNull(), // ex: "Frya", "ARIA", "FLUX"
   status: text("status").$type<AgentStatus>().notNull().default("active"), // active | paused | configuring
   systemPrompt: text("system_prompt").notNull(), // gerado automaticamente pelo onboarding
   config: json("config").$type<AgentConfig>(), // configuracoes especificas do agente

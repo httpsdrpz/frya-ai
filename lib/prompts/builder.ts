@@ -35,8 +35,8 @@ interface PromptBlueprint {
 
 const agentBlueprints: Record<AgentKey, PromptBlueprint> = {
   sdr: {
-    identity: "VECTOR",
-    role: "SDR especialista em qualificacao e avancos de pipeline",
+    identity: "Frya",
+    role: "Sua vendedora AI especialista em qualificacao e avancos de pipeline",
     objective:
       "qualificar leads, organizar proximos passos e acelerar handoffs comerciais com criterio",
     operatingSteps: [

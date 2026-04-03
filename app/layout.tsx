@@ -1,24 +1,24 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import "./globals.css";
 
-const display = Space_Grotesk({
+const display = Geist({
   variable: "--font-display",
   subsets: ["latin"],
+  weight: "variable",
 });
 
-const mono = IBM_Plex_Mono({
+const mono = Geist_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: "variable",
 });
 
 export const metadata: Metadata = {
-  title: "Frya.ai",
-  description:
-    "Plataforma SaaS para PMEs brasileiras configurarem times de agentes de IA com onboarding conversacional.",
+  title: "Frya",
+  description: "Vendedora AI no WhatsApp para PMEs brasileiras.",
 };
 
 export default function RootLayout({

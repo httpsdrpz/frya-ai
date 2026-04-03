@@ -18,7 +18,7 @@ import type {
 } from "../types";
 
 const agentNames: Record<AgentKey, string> = {
-  sdr: "VECTOR",
+  sdr: "Frya",
   cs: "ARIA",
   financeiro: "FLUX",
   marketing: "CIPHER",

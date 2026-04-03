@@ -20,7 +20,7 @@ export function createSdrAgent(company: CompanyProfile): AgentDefinition {
 
   return {
     id: "sdr",
-    name: "Frya SDR",
+    name: "Frya",
     sector: "Receita",
     description:
       "Qualifica leads, distribui oportunidades e conduz follow-ups com contexto de negocio.",
