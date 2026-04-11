@@ -21,7 +21,7 @@ export function createCsAgent(company: CompanyProfile): AgentDefinition {
       : 8);
 
   return {
-    id: "cs",d
+    id: "cs",
     name: "Frya CS",
     sector: "Experiencia",
     description:
