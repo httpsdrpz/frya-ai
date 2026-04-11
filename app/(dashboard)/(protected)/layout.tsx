@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getDatabaseHealth } from "@/lib/db";
-import { getOnboardingStateByUserId } from "@/lib/onboarding-setup";
+import { getDashboardWorkspaceByUserId } from "@/lib/frya-dashboard";
 
 export default async function ProtectedDashboardLayout({
   children,
@@ -16,9 +16,9 @@ export default async function ProtectedDashboardLayout({
     redirect("/sign-in");
   }
 
-  const onboardingState = await getOnboardingStateByUserId(userId);
+  const workspace = await getDashboardWorkspaceByUserId(userId);
 
-  if (!onboardingState.completed || !onboardingState.company) {
+  if (!workspace) {
     redirect("/onboarding");
   }
 
@@ -33,7 +33,10 @@ export default async function ProtectedDashboardLayout({
       dbHealth={getDatabaseHealth()}
       userId={userId}
       userLabel={userLabel}
-      companyName={onboardingState.company.name}
+      companyName={
+        workspace.businessProfile?.businessName ?? workspace.tenant.name
+      }
+      plan={workspace.tenant.plan}
     >
       {children}
     </DashboardShell>

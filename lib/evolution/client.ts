@@ -3,6 +3,7 @@ import "server-only";
 import type {
   ConnectionState,
   EvolutionInstance,
+  SendDocumentPayload,
   SendTextPayload,
 } from "@/lib/evolution/types";
 
@@ -399,6 +400,46 @@ export class EvolutionClient {
         body: JSON.stringify({
           number,
           text,
+          ...(payload.delay !== undefined ? { delay: payload.delay } : {}),
+        }),
+      },
+      () => undefined,
+    );
+  }
+
+  // Envia um documento/arquivo com legenda para o numero informado.
+  async sendDocument(
+    instanceName: string,
+    payload: SendDocumentPayload,
+  ): Promise<void> {
+    const normalizedInstanceName = ensureNonEmptyString(
+      instanceName,
+      "Nome da instancia",
+    );
+    const number = ensureNonEmptyString(payload.number, "Numero");
+    const media = ensureNonEmptyString(payload.media, "Arquivo");
+    const fileName =
+      payload.fileName && payload.fileName.trim()
+        ? payload.fileName.trim()
+        : "arquivo";
+
+    if (
+      payload.delay !== undefined &&
+      (!Number.isFinite(payload.delay) || payload.delay < 0)
+    ) {
+      throw new Error("Delay invalido. Use um numero maior ou igual a zero.");
+    }
+
+    await this.request(
+      `/message/sendMedia/${encodeURIComponent(normalizedInstanceName)}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          number,
+          mediatype: "document",
+          media,
+          fileName,
+          ...(payload.caption?.trim() ? { caption: payload.caption.trim() } : {}),
           ...(payload.delay !== undefined ? { delay: payload.delay } : {}),
         }),
       },

@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #020403;
-  --foreground: #f4f8f2;
-  --muted-foreground: #93a79b;
-  --surface: rgba(7, 10, 8, 0.78);
-  --surface-strong: #0d1712;
-  --primary: #0b6b3a;
-  --primary-foreground: #f7fff9;
-  --border: rgba(168, 199, 178, 0.12);
+  --background: #0a0a0a;
+  --foreground: #f5fff9;
+  --muted-foreground: #90a196;
+  --surface: rgba(18, 18, 18, 0.9);
+  --surface-strong: #151515;
+  --primary: #00ff88;
+  --primary-foreground: #03130b;
+  --border: rgba(255, 255, 255, 0.1);
 }
 
 @theme inline {
@@ -30,8 +30,9 @@
 
 html {
   background:
-    linear-gradient(180deg, rgba(11, 107, 58, 0.12), transparent 24%),
-    linear-gradient(135deg, #010201 0%, #050806 48%, #010201 100%);
+    radial-gradient(circle at top, rgba(0, 255, 136, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(0, 255, 136, 0.05), transparent 18%),
+    linear-gradient(135deg, #050505 0%, #0a0a0a 48%, #050505 100%);
 }
 
 body {
@@ -137,6 +138,38 @@ textarea {
   animation: frya-panel-in 420ms ease-out both;
 }
 
+@keyframes frya-quiz-step-forward {
+  from {
+    opacity: 0;
+    transform: translate3d(32px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes frya-quiz-step-back {
+  from {
+    opacity: 0;
+    transform: translate3d(-32px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-quiz-step-forward {
+  animation: frya-quiz-step-forward 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-quiz-step-back {
+  animation: frya-quiz-step-back 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @keyframes frya-in-view {
   from {
     opacity: 0;
@@ -177,14 +210,14 @@ textarea {
   0%,
   100% {
     box-shadow:
-      0 0 0 rgba(11, 107, 58, 0),
-      0 18px 46px rgba(11, 107, 58, 0.18);
+      0 0 0 rgba(0, 255, 136, 0),
+      0 18px 46px rgba(0, 255, 136, 0.18);
   }
 
   50% {
     box-shadow:
-      0 0 34px rgba(11, 107, 58, 0.22),
-      0 22px 58px rgba(11, 107, 58, 0.28);
+      0 0 34px rgba(0, 255, 136, 0.22),
+      0 22px 58px rgba(0, 255, 136, 0.28);
   }
 }
 
@@ -201,6 +234,8 @@ textarea {
   .frya-typing-dot,
   .animate-message-in,
   .animate-panel-in,
+  .animate-quiz-step-forward,
+  .animate-quiz-step-back,
   .animate-in-view,
   .animate-float-soft,
   .animate-glow-soft {

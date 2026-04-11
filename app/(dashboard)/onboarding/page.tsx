@@ -1,10 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { SalesOnboardingFlow } from "@/components/onboarding/SalesOnboardingFlow";
+import { OnboardingQuiz } from "@/components/onboarding/OnboardingQuiz";
 import {
-  getOnboardingInitialValues,
   getOnboardingStateByUserId,
 } from "@/lib/onboarding-setup";
+import { getOnboardingQuizInitialValues } from "@/lib/onboarding-quiz-server";
 
 export default async function OnboardingPage() {
   const { userId } = await auth();
@@ -20,8 +20,8 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <SalesOnboardingFlow
-      initialValues={getOnboardingInitialValues(onboardingState.company)}
+    <OnboardingQuiz
+      initialValues={getOnboardingQuizInitialValues(onboardingState.company)}
     />
   );
 }

@@ -25,7 +25,7 @@ const databaseUrl = process.env.DATABASE_URL ?? readLocalEnv("DATABASE_URL") ?? 
 
 export default defineConfig({
   dialect: "postgresql",
-  schema: "./db/schema.ts",
+  schema: ["./db/schema.ts", "./src/db/index.ts"],
   out: "./drizzle",
   dbCredentials: {
     url: databaseUrl,

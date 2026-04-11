@@ -31,5 +31,6 @@ export type {
   EvolutionInstance,
   EvolutionMessageData,
   EvolutionWebhookPayload,
+  SendDocumentPayload,
   SendTextPayload,
 } from "@/lib/evolution/types";

@@ -35,4 +35,12 @@ export interface SendTextPayload {
   delay?: number;
 }
 
+export interface SendDocumentPayload {
+  number: string;
+  media: string;
+  caption?: string;
+  fileName?: string;
+  delay?: number;
+}
+
 export type ConnectionState = "open" | "close" | "connecting";

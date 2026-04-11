@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import * as schema from "@/db/schema";
+import * as legacySchema from "@/db/schema";
+import * as multiTenantSchema from "@/src/db";
 import type { DatabaseHealth, OnboardingAnalysis } from "@/types";
 
 function readLocalEnv(key: string) {
@@ -43,7 +44,10 @@ const queryClient = hasUsableDatabaseUrl(databaseConfig.connectionString)
 
 const drizzleClient = queryClient
   ? drizzle(queryClient, {
-      schema,
+      schema: {
+        ...legacySchema,
+        ...multiTenantSchema,
+      },
     })
   : null;
 
